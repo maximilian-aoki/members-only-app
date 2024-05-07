@@ -5,6 +5,8 @@ const User = require("../db/models/user");
 const Message = require("../db/models/message");
 
 const asyncHandler = require("express-async-handler");
+const vd = require("../middleware/validator");
+const auth = require("../middleware/authenticator");
 
 // home (anyone) - GET
 router.get("/", (req, res, next) => {
@@ -17,9 +19,18 @@ router
   .get((req, res, next) => {
     res.send("get sign-up page");
   })
-  .post((req, res, next) => {
-    res.send("post to sign-up");
-  });
+  .post([
+    vd.pipe([
+      vd.validateFirstName,
+      vd.validateLastName,
+      vd.validateEmail,
+      vd.validatePassword,
+      vd.validateMembershipStatus,
+    ]),
+    (req, res, next) => {
+      res.send("post to sign-up");
+    },
+  ]);
 
 // log-in (anyone) - GET, POST
 router
@@ -27,9 +38,12 @@ router
   .get((req, res, next) => {
     res.send("get log-in page");
   })
-  .post((req, res, next) => {
-    res.send("post to log-in");
-  });
+  .post([
+    vd.pipe([vd.validateEmail, vd.validatePassword]),
+    (req, res, next) => {
+      res.send("post to log-in");
+    },
+  ]);
 
 // log-out (visitor, member, admin) - POST
 router.post("/log-out", (req, res, next) => {
@@ -42,7 +56,7 @@ router.post("/log-out", (req, res, next) => {
 });
 
 // view all messages (anyone, visitor, member, admin) - GET
-router.get("/messages", async (req, res, next) => {
+router.get("/messages", (req, res, next) => {
   res.send("all messages");
 });
 
@@ -52,9 +66,12 @@ router
   .get((req, res, next) => {
     res.send("get new message form");
   })
-  .post((req, res, next) => {
-    res.send("post new message");
-  });
+  .post([
+    vd.pipe([vd.validateTitle, vd.validateText]),
+    (req, res, next) => {
+      res.send("post new message");
+    },
+  ]);
 
 // user profile (visitor, member, admin) - GET, POST
 router
