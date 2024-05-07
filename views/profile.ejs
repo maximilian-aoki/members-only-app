@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html class="bg-cornsilk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secret Message Club</title>
+    <link rel="icon" type="image/x-icon" href="/images/shh.png" />
+    <link rel="stylesheet" href="/stylesheets/output.css" />
+  </head>
+  <body class="h-screen flex flex-col">
+    <header class="p-4 bg-rufous flex-none h-20 grid content-center">
+      <h1 class="text-2xl text-white font-bold">Secret Message Club ;)</h1>
+    </header>
+    <nav class="flex-none p-3 bg-caput text-white shadow-md">
+      <!-- DYNAMIC NAV OPTIONS -->
+      <ul class="flex justify-center gap-4 text-white text-sm underline">
+        <li class="hover:font-bold"><a href="/">Home</a></li>
+        <% if (locals.currentUser) { %>
+        <li class="hover:font-bold"><a href="/messages">Messages</a></li>
+        <li class="hover:font-bold">
+          <a href="<%= currentUser.url %>">Profile</a>
+        </li>
+        <li class="hover:font-bold"><a href="/log-out">Log Out</a></li>
+        <% } else { %>
+        <li class="hover:font-bold"><a href="/sign-up">Sign Up</a></li>
+        <li class="hover:font-bold"><a href="/log-in">Log In</a></li>
+        <% } %>
+      </ul>
+    </nav>
+    <main class="bg-cornsilk flex-1 p-4 flex flex-col gap-4">
+      <!-- DYNAMIC MAIN CONTENT OPTIONS -->
+      <h2 class="flex-none font-bold text-xl"><%= header %></h2>
+      <div class="flex-1 p-4 bg-chamoisee rounded-md shadow-md">
+        <form action="" method="POST" class="flex flex-col gap-4">
+          <div class="flex flex-col gap-2">
+            <label for="firstName" class="font-bold"
+              >First Name (required):</label
+            >
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              class="py-1 px-2 rounded"
+              required
+              maxlength="15"
+            />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="lastName" class="font-bold">Last Name:</label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              class="py-1 px-2 rounded"
+              maxlength="15"
+            />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="email" class="font-bold">Email (required):</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="py-1 px-2 rounded"
+              required
+            />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="password" class="font-bold">Password (required):</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="py-1 px-2 rounded"
+              required
+              minlength="6"
+              maxlength="20"
+            />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="passwordConfirm" class="font-bold"
+              >Confirm Password (required):</label
+            >
+            <input
+              type="password"
+              id="passwordConfirm"
+              name="passwordConfirm"
+              class="py-1 px-2 rounded"
+              required
+              minlength="6"
+              maxlength="20"
+            />
+          </div>
+          <input
+            type="submit"
+            class="font-bold bg-dukeblue rounded-xl text-white h-16 mt-4 hover:cursor-pointer"
+            value="Sign Up"
+          />
+        </form>
+        <% if (locals.errors) { %>
+        <ul class="text-sm font-bold text-rufous mt-4 flex flex-col gap-2">
+          <% errors.forEach(errorMsg => { %>
+          <li><%= errorMsg %></li>
+          <% }) %>
+        </ul>
+        <% } %>
+      </div>
+    </main>
+    <footer
+      class="bg-rufous text-white flex-none h-16 grid place-content-center"
+    >
+      <p>Copyright 2024 Maximilian Aoki</p>
+    </footer>
+  </body>
+</html>

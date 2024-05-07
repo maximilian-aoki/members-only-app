@@ -6,22 +6,26 @@ const validator = {};
 validator.validateFirstName = body("firstName")
   .trim()
   .notEmpty()
+  .withMessage("must provide first name")
   .isLength({ max: 15 })
+  .withMessage("first name cannot exceed 15 chars")
   .escape();
-validator.validateLastName = body("lastName")
-  .trim()
-  .isLength({ max: 15 })
-  .escape();
+validator.validateLastName = body("lastName").optional().trim().escape();
 validator.validateEmail = body("email")
   .trim()
   .notEmpty()
-  .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+  .withMessage("must provide email")
+  .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
+  .withMessage("email must be in valid format");
 validator.validatePassword = body("password")
   .notEmpty()
+  .withMessage("must provide password")
   .isLength({ min: 6, max: 20 })
+  .withMessage("password must be between 6 and 20 chars")
   .custom((value, { req }) => {
     return value === req.body.passwordConfirm;
   })
+  .withMessage("password must match the 'confirm password' field")
   .escape();
 validator.validateMembershipStatus = body("membershipStatus")
   .optional()

@@ -12,14 +12,25 @@ authMiddleware.baseAuthentication = (req, res, next) => {
   res.redirect("/log-in");
 };
 
-authMiddleware.advancedAuthentication = (req, res, next, redirectUrl) => {
-  if (
-    res.locals.currentUser.membershipStatus === "member" ||
-    res.locals.currentUser.membershipStatus === "admin"
-  ) {
-    return next();
+authMiddleware.memberAuthentication = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    if (
+      res.locals.currentUser.membershipStatus === "member" ||
+      res.locals.currentUser.membershipStatus === "admin"
+    ) {
+      return next();
+    }
   }
-  res.redirect(redirectUrl);
+  res.redirect("/log-in");
+};
+
+authMiddleware.adminAuthentication = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    if (res.locals.currentUser.membershipStatus === "admin") {
+      return next();
+    }
+  }
+  res.redirect("/log-in");
 };
 
 module.exports = authMiddleware;

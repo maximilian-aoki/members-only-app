@@ -31,29 +31,7 @@
       <!-- DYNAMIC MAIN CONTENT OPTIONS -->
       <h2 class="flex-none font-bold text-xl"><%= header %></h2>
       <div class="flex-1 p-4 bg-chamoisee rounded-md shadow-md">
-        <div class="h-full w-full flex flex-col gap-2">
-          <% if (locals.currentUser) { %>
-          <h3 class="font-bold">
-            Welcome back to the secret message club, <%= currentUser.firstName
-            %>!
-          </h3>
-          <% } else { %>
-          <h3 class="font-bold">Welcome to the secret message club!</h3>
-          <% } %>
-          <p>
-            As a <i class="text-white">signed-in user</i>, you can view all
-            messages (details are hidden).
-          </p>
-          <p>
-            As a <i class="text-white">member</i> (enter the code 'm3mb3r' on
-            your profile), you can view message details and create your own
-            messages!
-          </p>
-          <p>
-            As an <i class="text-white">admin</i> (secret password), you can
-            delete messages.
-          </p>
-        </div>
+        <div class="h-full w-full flex flex-col gap-2"></div>
       </div>
     </main>
     <footer
