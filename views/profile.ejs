@@ -32,72 +32,53 @@
       <h2 class="flex-none font-bold text-xl"><%= header %></h2>
       <div class="flex-1 p-4 bg-chamoisee rounded-md shadow-md">
         <form action="" method="POST" class="flex flex-col gap-4">
-          <div class="flex flex-col gap-2">
-            <label for="firstName" class="font-bold"
-              >First Name (required):</label
-            >
+          <div class="flex flex-col gap-2 text-lg">
+            <p><strong>Name:</strong> <%= locals.currentUser.fullName %></p>
+          </div>
+          <div class="flex flex-col gap-2 text-lg">
+            <p><strong>Email:</strong> <%= locals.currentUser.email %></p>
+          </div>
+          <div class="bg-rufous p-4 max-w-80 rounded flex flex-col gap-2">
+            <div class="flex flex-col gap-2 flex-initial">
+              <label for="membershipStatus" class="font-bold text-white"
+                >Membership Status:</label
+              >
+              <select
+                name="membershipStatus"
+                id="membershipStatus"
+                class="rounded h-8"
+              >
+                <% ["visitor", "member", "admin"].forEach(status => { %> <% if
+                (locals.currentUser.membershipStatus === status) { %>
+                <option selected><%= status %></option>
+                <% } else { %>
+                <option><%= status %></option>
+                <% } %> <% }) %>
+              </select>
+            </div>
+            <div class="flex flex-col gap-2 flex-initial">
+              <label for="membershipPassword" class="font-bold text-white"
+                >Password (for member/admin):</label
+              >
+              <input
+                type="password"
+                name="membershipPassword"
+                id="membershipPassword"
+                class="py-1 px-2 rounded"
+              />
+            </div>
             <input
-              type="text"
-              id="firstName"
-              name="firstName"
-              class="py-1 px-2 rounded"
-              required
-              maxlength="15"
+              type="submit"
+              class="font-bold bg-dukeblue rounded-xl text-white h-16 mt-4 hover:cursor-pointer flex-initial"
+              value="Change Membership"
             />
           </div>
-          <div class="flex flex-col gap-2">
-            <label for="lastName" class="font-bold">Last Name:</label>
-            <input
-              type="text"
-              id="lastName"
-              name="lastName"
-              class="py-1 px-2 rounded"
-              maxlength="15"
-            />
-          </div>
-          <div class="flex flex-col gap-2">
-            <label for="email" class="font-bold">Email (required):</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              class="py-1 px-2 rounded"
-              required
-            />
-          </div>
-          <div class="flex flex-col gap-2">
-            <label for="password" class="font-bold">Password (required):</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              class="py-1 px-2 rounded"
-              required
-              minlength="6"
-              maxlength="20"
-            />
-          </div>
-          <div class="flex flex-col gap-2">
-            <label for="passwordConfirm" class="font-bold"
-              >Confirm Password (required):</label
-            >
-            <input
-              type="password"
-              id="passwordConfirm"
-              name="passwordConfirm"
-              class="py-1 px-2 rounded"
-              required
-              minlength="6"
-              maxlength="20"
-            />
-          </div>
-          <input
-            type="submit"
-            class="font-bold bg-dukeblue rounded-xl text-white h-16 mt-4 hover:cursor-pointer"
-            value="Sign Up"
-          />
         </form>
-        <% if (locals.errors) { %>
+        <% if (locals.message) { %>
+        <p class="text-sm font-bold text-rufous italic mt-4">
+          <%= locals.message %>
+        </p>
+        <% } %> <% if (locals.errors) { %>
         <ul class="text-sm font-bold text-rufous mt-4 flex flex-col gap-2">
           <% errors.forEach(errorMsg => { %>
           <li><%= errorMsg %></li>

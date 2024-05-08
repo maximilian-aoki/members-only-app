@@ -5,23 +5,29 @@ const bcrypt = require("bcryptjs");
 const User = require("./db/models/user");
 
 passport.use(
-  new LocalStrategy(async (email, password, done) => {
-    try {
-      const user = await User.findOne({ email: email });
-      if (!user) {
-        return done(null, false, { message: "could not find user " });
-      }
+  new LocalStrategy(
+    {
+      usernameField: "email",
+      passwordField: "password",
+    },
+    async (email, password, done) => {
+      try {
+        const user = await User.findOne({ email: email });
+        if (!user) {
+          return done(null, false, { message: "could not find user" });
+        }
 
-      const bcryptMatch = bcrypt.compare(password, user.password);
-      if (!bcryptMatch) {
-        return done(null, false, { message: "wrong password" });
-      }
+        const bcryptMatch = await bcrypt.compare(password, user.password);
+        if (!bcryptMatch) {
+          return done(null, false, { message: "password does not match" });
+        }
 
-      return done(null, user);
-    } catch (err) {
-      return done(err);
+        return done(null, user);
+      } catch (err) {
+        return done(err);
+      }
     }
-  })
+  )
 );
 
 passport.serializeUser((user, cb) => {
@@ -30,6 +36,7 @@ passport.serializeUser((user, cb) => {
 
 passport.deserializeUser(async (id, cb) => {
   try {
+    console.log("getting most current user from MongoDB Store");
     const user = await User.findById(id);
     if (!user) {
       return cb(null, false);

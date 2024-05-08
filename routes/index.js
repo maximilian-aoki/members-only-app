@@ -1,13 +1,18 @@
+require("dotenv").config();
 const express = require("express");
 const router = express.Router();
+
 const User = require("../db/models/user");
 const Message = require("../db/models/message");
 
 const asyncHandler = require("express-async-handler");
 const { matchedData, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
+
 const vd = require("../middleware/validator");
 const auth = require("../middleware/authenticator");
+const passport = require("../passport");
+const { locals } = require("../app");
 
 // home (anyone) - GET
 router.get("/", (req, res, next) => {
@@ -33,7 +38,6 @@ router
       vd.validateMembershipStatus,
     ]),
     asyncHandler(async (req, res, next) => {
-      console.log(req.body);
       const errors = validationResult(req);
       if (errors.errors.length) {
         const allErrors = errors.array().map((error) => error.msg);
@@ -72,9 +76,10 @@ router
   })
   .post([
     vd.pipe([vd.validateEmail, vd.validatePassword]),
-    (req, res, next) => {
-      res.send("post to log-in");
-    },
+    passport.authenticate("local", {
+      successRedirect: "/messages",
+      failureRedirect: "/log-in",
+    }),
   ]);
 
 // log-out (visitor, member, admin) - GET
@@ -119,6 +124,14 @@ router
     },
   ]);
 
+// delete message (admin) - POST
+router.post("/messages/:id/delete-message", [
+  auth.adminAuthentication,
+  asyncHandler(async (req, res, next) => {
+    res.redirect("/messages");
+  }),
+]);
+
 // user profile (visitor, member, admin) - GET, POST
 router
   .route("/users/:id")
@@ -132,9 +145,61 @@ router
   ])
   .post([
     auth.baseAuthentication,
-    (req, res, next) => {
-      res.send("post user profile change");
-    },
+    vd.pipe([vd.validateMembershipStatus]),
+    asyncHandler(async (req, res, next) => {
+      const errors = validationResult(req);
+      if (errors.errors.length) {
+        const allErrors = errors.array().map((error) => error.msg);
+        return res.render("profile", {
+          header: `User Profile: ${res.locals.currentUser.fullName}`,
+          errors: allErrors,
+        });
+      }
+
+      const validatedData = matchedData(req);
+      let message = "no change to membership status";
+      if (
+        validatedData.membershipStatus === "visitor" &&
+        res.locals.currentUser.membershipStatus !== "visitor"
+      ) {
+        const user = await User.findById(res.locals.currentUser.id);
+        user.membershipStatus = "visitor";
+        await user.save();
+        res.locals.currentUser = user;
+        message = "successful membership change";
+      } else if (
+        validatedData.membershipStatus === "member" &&
+        res.locals.currentUser.membershipStatus !== "member"
+      ) {
+        if (req.body.membershipPassword === process.env.MEMBER_PASSWORD) {
+          const user = await User.findById(res.locals.currentUser.id);
+          user.membershipStatus = "member";
+          await user.save();
+          res.locals.currentUser = user;
+          message = "successful membership change";
+        } else {
+          message = "wrong password!";
+        }
+      } else if (
+        validatedData.membershipStatus === "admin" &&
+        res.locals.currentUser.membershipStatus !== "admin"
+      ) {
+        if (req.body.membershipPassword === process.env.ADMIN_PASSWORD) {
+          const user = await User.findById(res.locals.currentUser.id);
+          user.membershipStatus = "admin";
+          await user.save();
+          res.locals.currentUser = user;
+          message = "successful membership change";
+        } else {
+          message = "wrong password!";
+        }
+      }
+
+      res.render("profile", {
+        header: `User Profile: ${res.locals.currentUser.fullName}`,
+        message,
+      });
+    }),
   ]);
 
 module.exports = router;

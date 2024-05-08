@@ -29,7 +29,9 @@ validator.validatePassword = body("password")
   .escape();
 validator.validateMembershipStatus = body("membershipStatus")
   .optional()
-  .isIn(["visitor", "member", "admin"]);
+  .isIn(["visitor", "member", "admin"])
+  .withMessage("not a valid membership status")
+  .escape();
 
 // message validators
 validator.validateTitle = body("title").trim().notEmpty().isLength({ max: 30 });
