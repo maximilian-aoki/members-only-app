@@ -29,9 +29,48 @@
     </nav>
     <main class="bg-cornsilk flex-1 p-4 flex flex-col gap-4">
       <!-- DYNAMIC MAIN CONTENT OPTIONS -->
-      <h2 class="flex-none font-bold text-xl"><%= header %></h2>
+      <div class="flex-none flex items-center gap-4">
+        <h2 class="font-bold text-xl"><%= header %></h2>
+        <% if (locals.currentUser && ["member",
+        "admin"].includes(locals.currentUser.membershipStatus)) { %>
+        <a
+          class="text-sm rounded bg-dukeblue text-white px-2 py-1 hover:cursor-pointer"
+          href="/messages/create"
+          >Add Message</a
+        >
+        <% } %>
+      </div>
       <div class="flex-1 p-4 bg-chamoisee rounded-md shadow-md">
-        <div class="h-full w-full flex flex-col gap-2"></div>
+        <div class="h-full w-full flex flex-col gap-2">
+          <% if (locals.allMessages.length) { %> <%
+          locals.allMessages.forEach((message) => { %>
+          <div class="bg-cornsilk rounded-lg p-2 flex flex-col gap-1">
+            <div class="flex content-start gap-4 items-center justify-between">
+              <p class="text-lg font-bold"><%= message.title %></p>
+              <% if (locals.currentUser.membershipStatus === "admin") { %>
+              <form action="/messages/<%= message.id %>/delete" method="POST">
+                <input
+                  type="submit"
+                  value="Delete"
+                  class="text-sm text-rufous italic hover:cursor-pointer"
+                />
+              </form>
+              <% } %>
+            </div>
+            <p class="mb-1"><%= message.text %></p>
+            <% if (["member",
+            "admin"].includes(locals.currentUser.membershipStatus)) { %>
+            <p class="italic text-sm self-end">
+              <%= message.user %> - <%= message.formattedTimestamp %>
+            </p>
+            <% } else { %>
+            <p class="italic text-sm self-end">anonymous</p>
+            <% } %>
+          </div>
+          <% }); %> <% } else { %>
+          <p>No messages added yet!</p>
+          <% } %>
+        </div>
       </div>
     </main>
     <footer

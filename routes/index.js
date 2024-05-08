@@ -98,11 +98,13 @@ router.get("/log-out", [
 // view all messages (visitor, member, admin) - GET
 router.get("/messages", [
   auth.baseAuthentication,
-  (req, res, next) => {
+  asyncHandler(async (req, res, next) => {
+    const allMessages = await Message.find().sort({ createdAt: -1 }).exec();
     res.render("messages", {
       header: "All Messages",
+      allMessages,
     });
-  },
+  }),
 ]);
 
 // create new message (member, admin) - GET, POST
@@ -111,7 +113,7 @@ router
   .get([
     auth.memberAuthentication,
     (req, res, next) => {
-      res.get("message-create", {
+      res.render("message-create", {
         header: "Create a Message!",
       });
     },
@@ -119,15 +121,35 @@ router
   .post([
     auth.memberAuthentication,
     vd.pipe([vd.validateTitle, vd.validateText]),
-    (req, res, next) => {
-      res.send("post new message");
-    },
+    asyncHandler(async (req, res, next) => {
+      const errors = validationResult(req);
+      if (errors.errors.length) {
+        const allErrors = errors.array().map((error) => error.msg);
+        return res.render("message-create", {
+          header: "Create a Message!",
+          errors: allErrors,
+          postVals: {
+            title: req.body.title,
+            text: req.body.text,
+          },
+        });
+      }
+
+      const validatedData = matchedData(req);
+      await Message.create({
+        title: validatedData.title,
+        text: validatedData.text,
+        user: res.locals.currentUser.fullName,
+      });
+      res.redirect("/messages");
+    }),
   ]);
 
 // delete message (admin) - POST
-router.post("/messages/:id/delete-message", [
+router.post("/messages/:id/delete", [
   auth.adminAuthentication,
   asyncHandler(async (req, res, next) => {
+    await Message.deleteOne({ _id: req.params.id });
     res.redirect("/messages");
   }),
 ]);

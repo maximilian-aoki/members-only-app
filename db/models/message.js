@@ -14,8 +14,7 @@ const messageSchema = new mongoose.Schema(
       maxLength: 200,
     },
     user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: String,
       required: true,
     },
   },

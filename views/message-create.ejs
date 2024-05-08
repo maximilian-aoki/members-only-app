@@ -34,31 +34,16 @@
         <form action="" method="POST" class="flex flex-col gap-4">
           <div class="flex flex-col gap-2">
             <label for="title" class="font-bold">Title (required):</label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              class="py-1 px-2 rounded"
-              required
-              maxlength="30"
-            />
+            <input type="text" id="title" name="title" class="py-1 px-2 rounded"
+            required maxlength="30" value="<%= locals.postVals ? postVals.title
+            : "" %>" />
           </div>
           <div class="flex flex-col gap-2">
-            <label for="text" class="font-bold">Text:</label>
-            <input
-              type="text"
-              id="text"
-              name="text"
-              class="py-1 px-2 rounded"
-              required
-              maxlength="300"
-            />
+            <label for="text" class="font-bold">Text (required):</label>
+            <input type="text" id="text" name="text" class="py-1 px-2 rounded"
+            required maxlength="300" value="<%= locals.postVals ? postVals.text
+            : "" %>" />
           </div>
-          <input
-            type="hidden"
-            name="userId"
-            value="<%= locals.currentUser.id %>"
-          />
           <input
             type="submit"
             class="font-bold bg-dukeblue rounded-xl text-white h-16 mt-4 hover:cursor-pointer"
